@@ -1,0 +1,43 @@
+Auth Routes
+POST    /api/auth/register
+POST    /api/auth/login
+GET     /api/auth/me         // Get logged-in user details
+PUT     /api/auth/update     // Update user profile
+DELETE  /api/auth/delete     // Delete user account
+
+
+2. Business Controller (Managing Businesses)
+POST    /api/businesses       // Create a new business
+GET     /api/businesses       // Get all businesses
+GET     /api/businesses/:id   // Get business by ID
+GET     /api/businesses/category/:category // Get businesses by category
+PUT     /api/businesses/:id   // Update business details
+DELETE  /api/businesses/:id   // Delete a business
+
+3. Business Address Controller
+POST    /api/businesses/:id/address       // Add address to a business
+GET     /api/businesses/:id/address       // Get business address
+PUT     /api/businesses/:id/address       // Update business address
+
+4. Review Controller (User Reviews for Businesses)
+POST    /api/reviews/:businessId          // Add a review to a business
+GET     /api/reviews/:businessId          // Get all reviews for a business
+DELETE  /api/reviews/:reviewId            // Delete a review
+
+5. User Interaction Controller (Likes & Saves)
+POST    /api/interactions/like/:businessId   // Like/Unlike a business
+POST    /api/interactions/save/:businessId   // Save/Unsave a business
+GET     /api/interactions/liked              // Get liked businesses
+GET     /api/interactions/saved              // Get saved businesses
+
+6. Search Controller (Filtering Businesses)
+GET    /api/search?category=Health&city=Agra  // Search businesses
+
+
+controllers/
+    authController.js
+    businessController.js
+    businessAddressController.js
+    reviewController.js
+    userInteractionController.js
+    searchController.js
