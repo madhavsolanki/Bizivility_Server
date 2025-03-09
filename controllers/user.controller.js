@@ -1,10 +1,7 @@
 import User from "../models/user.model.js";
-import Review from "../models/review.model.js";
-import UserBusinessInteraction from "../models/user_interaction.model.js";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import dotenv from  'dotenv';
-import Business from "../models/business.model.js";
 
 dotenv.config();
 
@@ -104,54 +101,6 @@ export const getUserController = async (req, res) => {
   }
 }
 
-// Delete User
-export const deleteUserController = async (req, res) => {
-  try {
-    // Authenticated User Id
-    const userId = req.user._id;
-    
-    // Find the User
-    const user = await User.findById(userId);
 
-    if(!user){
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    // Delete User Businesses
-    await Business.deleteMany({createdBy: userId});
-
-    // Delete User Reviews
-    await Review.deleteMany({createdBy: userId});
-    
-    // Delete User User Business Interactions
-    await UserBusinessInteraction.deleteMany({userId: userId});
-
-    // Delete the User
-    await User.findByIdAndDelete(userId);
-
-    // Send account deletion confirmation on email
-    const mailOptions = {
-      from: process.env.SMTP_MAIL,
-      to: user.email,
-      subject: "Account Deletion Successfully",
-      text: `Dear ${user.firstName},\n\nYour account has been successfully deleted.\n\nIf this was a mistake, please contact support.\n\nBest regards,\nYour Company`,
-    }
-
-    transporter.sendMail(mailOptions, (err, info) => {
-      if(err){
-        console.log("Error sending email: ", err);
-      }
-      else{
-        console.log("Email Sent: ", info.response);
-      }
-    });
-
-    res.status(200).json({ message: "Account deleted successfully." });
-
-  } catch (error) {
-    console.error("Error deleting user: ", error);
-    res.status(500).json({message: "Internal Server Error"})
-  }
-}
 
 

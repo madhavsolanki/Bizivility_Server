@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';  // Import CORS middleware
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
-import businessRoutes from './routes/business.routes.js';
+import listingRoutes from "./routes/listing.routes.js";
 
 dotenv.config();
 connectDB();
@@ -19,7 +19,7 @@ app.use(cookieParser());
 // APIS
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-app.use('/api/business', businessRoutes);
+app.use("/api/listings", listingRoutes);
 
 app.listen(process.env.PORT || 5500, "0.0.0.0", () => {
   console.log(`Server is running on port ${process.env.PORT || 5500}`);
