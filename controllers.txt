@@ -1,6 +1,9 @@
-Auth Routes
-POST    /api/auth/register
-POST    /api/auth/login
+0. Auth Routes 
+POST    /api/auth/register // Register
+POST    /api/auth/login   // login
+POST    /api/auth/forgot-password   // forgot password
+
+1. User Routes
 GET     /api/auth/me         // Get logged-in user details
 PUT     /api/auth/update     // Update user profile
 DELETE  /api/auth/delete     // Delete user account
@@ -36,8 +39,14 @@ GET    /api/search?category=Health&city=Agra  // Search businesses
 
 controllers/
     authController.js
+    userController.js
     businessController.js
     businessAddressController.js
     reviewController.js
     userInteractionController.js
     searchController.js
+
+
+// carrer page options
+
+// https://www.justdial.com/cms/career-opportunities/all-cities?jdlite=0&source=77&version=&nh=&investor=0&historyBack=0

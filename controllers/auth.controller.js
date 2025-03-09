@@ -20,6 +20,8 @@ const generateRandomPassword = () => {
   return Math.random().toString(36).slice(-8); // Generates an 8-character password
 };
 
+// -------------------------- Controllers --------------------------------
+
 export const registerController = async (req, res) => {
   try {
     const { username, email } = req.body;
