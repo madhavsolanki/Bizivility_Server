@@ -3,12 +3,12 @@ import Listing from "../models/listing.model.js";
 // Create Listing (Admins Only)
 export const createListing = async (req, res) => {
     try {
-        const { planType, price, features } = req.body;
-        if (!planType || !price || !Array.isArray(features) || features.length === 0) {
+        const { planType, planDuration, price, features } = req.body;
+        if (!planType || !planDuration || !price || !Array.isArray(features) || features.length === 0) {
             return res.status(400).json({ message: "All fields are required." });
         }
 
-        const listing = new Listing({ planType, price, features });
+        const listing = new Listing({ planType, planDuration, price, features });
         await listing.save();
         res.status(201).json({ success: true, data: listing });
     } catch (error) {
@@ -34,6 +34,7 @@ export const updateListing = async (req, res) => {
         if (!listing) return res.status(404).json({ message: "Listing not found" });
 
         listing.planType = req.body.planType || listing.planType;
+        listing.planDuration = req.body.planDuration || listing.planDuration;
         listing.price = req.body.price || listing.price;
         listing.features = req.body.features && Array.isArray(req.body.features) ? req.body.features : listing.features;
 

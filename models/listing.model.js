@@ -6,6 +6,12 @@ const listingSchema = new mongoose.Schema({
       type:String,
       required:true
     },
+    
+    planDuration:{
+      type: String,
+      enum:["monthly", "annual"],
+      required:true
+    },
 
     price:{
       type:Number,
