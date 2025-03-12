@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const formSchema = new mongoose.Schema(
   {
-    adminId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who filled the form
+    buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who filled the form
     plan: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Listing",
@@ -141,10 +141,3 @@ const Form = mongoose.model("Form", formSchema);
 
 export default Form;
 
-
-//here we have to assign the user id  beacuse we have to specify which user is buying the plan
-// or we can say that store the buyer id
-
-
-// What is the floe
-// here admin fill the form for the user assign to the particular user(buyer)
