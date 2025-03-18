@@ -1,11 +1,49 @@
 import User from "../models/user.model.js";
 import Form from "../models/form.model.js";
 import Listing from "../models/listing.model.js";
+import nodemailer from "nodemailer";
 
 /**
  * @desc Middleware to check if the requester is an admin
  */
-const isAdmin = (req) => req.user && req.user.role === "admin";
+const isUser = (req) => req.user && req.user.role === "user";
+
+/**
+ * @desc Sends an email notification to the user after form submission
+ */
+const sendEmailNotification = async (userEmail, listingTitle) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_MAIL,
+        pass: process.env.SMTP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_MAIL,
+      to: userEmail,
+      subject: "Form Submission Confirmation - Bizivility",
+      html: `
+        <p>Dear Valued Customer,</p>
+        <p>Thank you for submitting your form for <strong>${listingTitle}</strong>.</p>
+        <p>We appreciate your trust in <strong>Bizivility</strong>.</p>
+        <p>Best regards,</p>
+        <p><strong>Bizivility Team</strong></p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to send email notification.",
+      error: error.message
+    })
+  }
+}
 
 /**
  * @route POST /api/forms/:userId/:planId
@@ -13,8 +51,7 @@ const isAdmin = (req) => req.user && req.user.role === "admin";
  */
 export const createForm = async (req, res) => {
   try {
-    if(!isAdmin(req))
-      return res.status(403).json({ message: "Access denied. Only admins can fill forms" });
+    if (!isUser(req)) return res.status(403).json({ message: "Access denied. Users only." });
 
     const { userId, planId} = req.params;
     const formData = req.body;
@@ -32,6 +69,13 @@ export const createForm = async (req, res) => {
     const newForm = new Form({buyerId: userId, plan:planId, ...formData});
     await newForm.save();
 
+    // Update the user's associatedForms array
+    user.associatedForms.push(newForm._id);
+    await user.save();
+
+    // Send email notification
+    await sendEmailNotification(user.email, formData.primaryDetails.listingTitle);
+
     res.status(201).json({ message: "Form Submitted successfully.", form: newForm });
 
   } catch (error) {
@@ -45,8 +89,6 @@ export const createForm = async (req, res) => {
  */
 export const updateForm = async (req, res) => {
   try {
-    if (!isAdmin(req)) 
-      return res.status(403).json({ message: "Access denied. Admins only." });
 
     const { formId } = req.params;
     const updatedData = req.body;
@@ -77,7 +119,7 @@ export const updateForm = async (req, res) => {
  */
 export const getAllForms = async (req, res) => {
   try {
-    if (!isAdmin(req)) return res.status(403).json({ message: "Access denied. Admins only." });
+   
 
     const forms = await Form.find().populate("buyerId plan");
     res.status(200).json({ message: "Forms fetched successfully.", forms });
@@ -92,7 +134,6 @@ export const getAllForms = async (req, res) => {
  */
 export const getSingleForm = async (req, res) => {
   try {
-    if (!isAdmin(req)) return res.status(403).json({ message: "Access denied. Admins only." });
 
     const { formId } = req.params;
     const form = await Form.findById(formId).populate("buyerId plan");
@@ -111,7 +152,6 @@ export const getSingleForm = async (req, res) => {
  */
 export const deleteForm = async (req, res) => {
   try {
-    if (!isAdmin(req)) return res.status(403).json({ message: "Access denied. Admins only." });
 
     const { formId } = req.params;
     const deletedForm = await Form.findByIdAndDelete(formId);

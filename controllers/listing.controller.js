@@ -27,6 +27,29 @@ export const getListings = async (req, res) => {
     }
 };
 
+
+// Fetch Listings by Plan Duration
+export const getListingsByDuration = async (req, res) => {
+    try {
+        const { duration } = req.params; // Get duration from URL parameter
+
+        // Validate input
+        if (!["monthly", "annual"].includes(duration.toLowerCase())) {
+            return res.status(400).json({ success: false, message: "Invalid plan duration. Use 'monthly' or 'annual'." });
+        }
+
+        // Fetch listings based on duration
+        const listings = await Listing.find({ planDuration: duration.toLowerCase() });
+
+        res.status(200).json({ success: true, data: listings });
+    } catch (error) {
+        console.error("Error fetching listings:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
+
 // Update Listing (Admins Only)
 export const updateListing = async (req, res) => {
     try {

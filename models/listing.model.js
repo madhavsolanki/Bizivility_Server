@@ -24,8 +24,11 @@ const listingSchema = new mongoose.Schema({
     },
   ],
 
-  enabled: { type: Boolean, default: false },
-  expirationDate: { type: Date },
+  purchased:{
+    type: Boolean,
+    default: false,
+  }
+  
 },{timestamps: true});
 
 const Listing = mongoose.model("Listing", listingSchema);

@@ -26,12 +26,18 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+
+    password: {
+      type: String,  
+      required: true,
+    },
+
     phoneNumber:{
       type: String,
     },
 
-    adreessLine1:{
-      type: String
+    addressLine1:{
+      type: String  
     },
     addressLine2:{
       type: String
@@ -40,6 +46,9 @@ const userSchema = new mongoose.Schema(
       type: String
     },
     zipCode:{
+      type: String
+    },
+    state:{
       type: String
     },
     country:{
@@ -66,21 +75,54 @@ const userSchema = new mongoose.Schema(
     pinterest:{
       type: String
     },
-    password: {
-      type: String,
-      required: true,
-    },
+
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-    purchasedPlans: [
-      {
-        plan: { type: mongoose.Schema.Types.ObjectId, ref: "Listing" },
-        expirationDate: { type: Date }
-      }
-    ]
+
+    dashboard:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Dashboard"
+    },
+
+    announcements:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Announcement"
+    }],
+
+    events:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event"
+    }],
+
+    coupons:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coupon"
+    }],
+
+
+    adCompaign:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Compaign"
+    }],
+
+    reviews:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review"
+    }],
+
+    enquires:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Enquiry"
+    }],
+
+    associatedForms:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Form"
+    }],
+
   },
   { timestamps: true }
 );
