@@ -1,6 +1,6 @@
 import express from 'express';
 import authenticateUser from '../middlewares/authenticateUser.middleware.js';
-import { createForm, deleteForm, getAllForms, getSingleForm, updateForm } from '../controllers/form.controller.js';
+import { createForm, deleteForm, getAllForms, getSingleForm, updateForm } from '../controllers/listing.controller.js';
 
 const router = express.Router();
 

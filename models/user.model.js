@@ -2,19 +2,19 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    profilePhoto:{
+    profilePhoto: {
       type: String,
-      default: ''
+      default: "",
     },
-    firstName:{
-      type:String,
-      minLength:[3,'At least 3 characters in required'],
-      maxLength:[30,'maximum 30 can be entered']
+    firstName: {
+      type: String,
+      minLength: [3, "At least 3 characters in required"],
+      maxLength: [30, "maximum 30 can be entered"],
     },
-    lastName:{
-      type:String,
-      minLength:[3,'At least 3 characters in required'],
-      maxLength:[30,'maximum 30 can be entered']
+    lastName: {
+      type: String,
+      minLength: [3, "At least 3 characters in required"],
+      maxLength: [30, "maximum 30 can be entered"],
     },
     username: {
       type: String,
@@ -28,52 +28,52 @@ const userSchema = new mongoose.Schema(
     },
 
     password: {
-      type: String,  
+      type: String,
       required: true,
     },
 
-    phoneNumber:{
+    phoneNumber: {
       type: String,
     },
 
-    addressLine1:{
-      type: String  
+    addressLine1: {
+      type: String,
     },
-    addressLine2:{
-      type: String
+    addressLine2: {
+      type: String,
     },
-    city:{
-      type: String
+    city: {
+      type: String,
     },
-    zipCode:{
-      type: String
+    zipCode: {
+      type: String,
     },
-    state:{
-      type: String
+    state: {
+      type: String,
     },
-    country:{
-      type:String
+    country: {
+      type: String,
     },
 
-    about:{
+    about: {
       type: String,
-      maxLength:[500,'maximum 500 can be entered'],
-      minLength:[10, 'At least 10 characters is required']
+      maxLength: [500, "maximum 500 can be entered"],
+      minLength: [10, "At least 10 characters is required"],
     },
-    facebookUrl:{
-      type:String
+    facebookUrl: {
+      type: String,
     },
-    twitterUrl:{
-      type: String
+    twitterUrl: {
+      type: String,
     },
-    linkedinUrl:{
-      type: String
+    linkedinUrl: {
+      type: String,
     },
-    instagramUrl:{
-      type: String
+    instagramUrl: {
+      type: String,
     },
-    pinterest:{
-      type: String
+    pinterest: {
+      type: String,
     },
 
     role: {
@@ -82,47 +82,59 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    dashboard:{
+    dashboard: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Dashboard"
+      ref: "Dashboard",
     },
 
-    announcements:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Announcement"
-    }],
+    announcements: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Announcement",
+      },
+    ],
 
-    events:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Event"
-    }],
+    events: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      },
+    ],
 
-    coupons:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Coupon"
-    }],
+    coupons: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coupon",
+      },
+    ],
 
+    adCompaign: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Compaign",
+      },
+    ],
 
-    adCompaign:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Compaign"
-    }],
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
 
-    reviews:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Review"
-    }],
+    enquires: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Enquiry",
+      },
+    ],
 
-    enquires:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Enquiry"
-    }],
-
-    associatedForms:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Form"
-    }],
-
+    associatedForms: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Form",
+      },
+    ],
   },
   { timestamps: true }
 );

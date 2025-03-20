@@ -1,81 +1,165 @@
-import Listing from "../models/listing.model.js";
+import User from "../models/user.model.js";
+import Form from "../models/listing.model.js";
+import Listing from "../models/plan.model.js";
+import nodemailer from "nodemailer";
 
-// Create Listing (Admins Only)
-export const createListing = async (req, res) => {
-    try {
-        const { planType, planDuration, price, features } = req.body;
-        if (!planType || !planDuration || !price || !Array.isArray(features) || features.length === 0) {
-            return res.status(400).json({ message: "All fields are required." });
-        }
+/**
+ * @desc Middleware to check if the requester is an admin
+ */
+const isUser = (req) => req.user && req.user.role === "user";
 
-        const listing = new Listing({ planType, planDuration, price, features });
-        await listing.save();
-        res.status(201).json({ success: true, data: listing });
-    } catch (error) {
-        console.error("Error creating listing:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+/**
+ * @desc Sends an email notification to the user after form submission
+ */
+const sendEmailNotification = async (userEmail, listingTitle) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_MAIL,
+        pass: process.env.SMTP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_MAIL,
+      to: userEmail,
+      subject: "Form Submission Confirmation - Bizivility",
+      html: `
+        <p>Dear Valued Customer,</p>
+        <p>Thank you for submitting your form for <strong>${listingTitle}</strong>.</p>
+        <p>We appreciate your trust in <strong>Bizivility</strong>.</p>
+        <p>Best regards,</p>
+        <p><strong>Bizivility Team</strong></p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to send email notification.",
+      error: error.message
+    })
+  }
+}
+
+/**
+ * @route POST /api/forms/:userId/:planId
+ * @desc Create a new form (Only Admin)
+ */
+export const createForm = async (req, res) => {
+  try {
+    if (!isUser(req)) return res.status(403).json({ message: "Access denied. Users only." });
+
+    const { userId, planId} = req.params;
+    const formData = req.body;
+
+    const user = await User.findById(userId);
+
+    if(!user || user.role !== "user")
+      return res.status(404).json({ message: "User not found or invalid role." });
+
+    const plan = await Listing.findById(planId);
+
+    if(!plan)
+      return res.status(404).json({ message: "Plan not found." });
+
+    const newForm = new Form({buyerId: userId, plan:planId, ...formData});
+    await newForm.save();
+
+    // Update the user's associatedForms array
+    user.associatedForms.push(newForm._id);
+    await user.save();
+
+    // Send email notification
+    await sendEmailNotification(user.email, formData.primaryDetails.listingTitle);
+
+    res.status(201).json({ message: "Form Submitted successfully.", form: newForm });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
+  }
+}
+
+/**
+ * @route PUT /api/forms/:formId
+ * @desc Update form details (Only Admin)
+ */
+export const updateForm = async (req, res) => {
+  try {
+
+    const { formId } = req.params;
+    const updatedData = req.body;
+
+    // Fetch the existing form data
+    const existingForm = await Form.findById(formId);
+    if (!existingForm) 
+      return res.status(404).json({ message: "Form not found." });
+
+    // Deep merge existing form data with updated data
+    const mergedData = { ...existingForm.toObject(), ...updatedData };
+
+    // Update form using `save()` instead of `findByIdAndUpdate()`
+    Object.assign(existingForm, mergedData);
+    await existingForm.save(); // `save()` ensures proper validation
+
+    res.status(200).json({ message: "Form updated successfully.", form: existingForm });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
+  }
 };
 
-// Get All Listings
-export const getListings = async (req, res) => {
-    try {
-        const listings = await Listing.find();
-        res.status(200).json({ success: true, data: listings });
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+
+/**
+ * @route GET /api/forms
+ * @desc Get all forms (Only Admin)
+ */
+export const getAllForms = async (req, res) => {
+  try {
+   
+
+    const forms = await Form.find().populate("buyerId plan");
+    res.status(200).json({ message: "Forms fetched successfully.", forms });
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
+  }
 };
 
+/**
+ * @route GET /api/forms/:formId
+ * @desc Get a single form (Only Admin)
+ */
+export const getSingleForm = async (req, res) => {
+  try {
 
-// Fetch Listings by Plan Duration
-export const getListingsByDuration = async (req, res) => {
-    try {
-        const { duration } = req.params; // Get duration from URL parameter
+    const { formId } = req.params;
+    const form = await Form.findById(formId).populate("buyerId plan");
 
-        // Validate input
-        if (!["monthly", "annual"].includes(duration.toLowerCase())) {
-            return res.status(400).json({ success: false, message: "Invalid plan duration. Use 'monthly' or 'annual'." });
-        }
+    if (!form) return res.status(404).json({ message: "Form not found." });
 
-        // Fetch listings based on duration
-        const listings = await Listing.find({ planDuration: duration.toLowerCase() });
-
-        res.status(200).json({ success: true, data: listings });
-    } catch (error) {
-        console.error("Error fetching listings:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+    res.status(200).json({ message: "Form fetched successfully.", form });
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
+  }
 };
 
+/**
+ * @route DELETE /api/forms/:formId
+ * @desc Delete a form (Only Admin)
+ */
+export const deleteForm = async (req, res) => {
+  try {
 
+    const { formId } = req.params;
+    const deletedForm = await Form.findByIdAndDelete(formId);
 
-// Update Listing (Admins Only)
-export const updateListing = async (req, res) => {
-    try {
-        const listing = await Listing.findById(req.params.id);
-        if (!listing) return res.status(404).json({ message: "Listing not found" });
+    if (!deletedForm) return res.status(404).json({ message: "Form not found." });
 
-        listing.planType = req.body.planType || listing.planType;
-        listing.planDuration = req.body.planDuration || listing.planDuration;
-        listing.price = req.body.price || listing.price;
-        listing.features = req.body.features && Array.isArray(req.body.features) ? req.body.features : listing.features;
-
-        await listing.save();
-        res.status(200).json({ success: true, data: listing });
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-};
-
-// Delete Listing (Admins Only)
-export const deleteListing = async (req, res) => {
-    try {
-        const listing = await Listing.findByIdAndDelete(req.params.id);
-        if (!listing) return res.status(404).json({ message: "Listing not found" });
-
-        res.status(200).json({ message: "Listing deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+    res.status(200).json({ message: "Form deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
+  }
 };

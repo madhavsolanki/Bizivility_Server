@@ -1,5 +1,5 @@
 import express from "express";
-import { createListing, getListings, updateListing, deleteListing, getListingsByDuration } from "../controllers/listing.controller.js";
+import { createListing, getListings, updateListing, deleteListing, getListingsByDuration } from "../controllers/plan.controller.js";
 import authenticateUser from "../middlewares/authenticateUser.middleware.js";
 import isAdmin from "../middlewares/admin.middleware.js.js";
 

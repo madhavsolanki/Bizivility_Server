@@ -14,7 +14,7 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: "*", credentials: true })); // Allow all origins (for testing)
+app.use(cors({ origin: "*", credentials: true })); 
 app.use(express.json());
 app.use(cookieParser());
 

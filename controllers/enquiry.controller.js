@@ -1,5 +1,5 @@
 import Enquiry from "../models/enquiry.model.js";
-import Listing from "../models/listing.model.js";
+import Listing from "../models/plan.model.js";
 import nodemailer from "nodemailer";
 import User from "../models/user.model.js";
 
