@@ -4,6 +4,7 @@ import {
   getUserController,
   updateUserController,
 } from "../controllers/user.controller.js";
+import { uploadProfile } from "../config/multer.js";
 
 const router = express.Router();
 
@@ -11,7 +12,8 @@ const router = express.Router();
 router.route("/profile").get(authenticateUser, getUserController);
 
 // Update User Info
-router.route("/update").put(authenticateUser, updateUserController);
+router.put("/update", authenticateUser, uploadProfile.single("profilePhoto"), updateUserController);
+
 
 
 

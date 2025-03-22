@@ -82,38 +82,33 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    dashboard: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Dashboard",
-    },
+    // dashboard: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Dashboard",
+    // },
 
-    announcements: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Announcement",
-      },
-    ],
+    
 
-    events: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Event",
-      },
-    ],
+    // events: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Event",
+    //   },
+    // ],
 
-    coupons: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Coupon",
-      },
-    ],
+    // coupons: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Coupon",
+    //   },
+    // ],
 
-    adCompaign: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Compaign",
-      },
-    ],
+    // adCompaign: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Compaign",
+    //   },
+    // ],
 
     reviews: [
       {
@@ -129,7 +124,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    associatedForms: [
+    ownedListings: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Form",

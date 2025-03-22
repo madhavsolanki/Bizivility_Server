@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import dotenv from  'dotenv';
+import cloudinary from "../config/cloudinary.js";
 
 dotenv.config();
 
@@ -9,8 +10,8 @@ dotenv.config();
 // Update User Info
 export const updateUserController = async (req, res) => {
   try {
-    const userId = req.user._id; // Extract user ID from auth middleware
-    const updates = { ...req.body }; // Clone request body to avoid mutation
+    const userId = req.user._id;
+    const updates = { ...req.body };
 
     // Find user
     const user = await User.findById(userId);
@@ -18,19 +19,29 @@ export const updateUserController = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Hash password if it's being updated
+    // 🔹 Handle profile photo update
+    if (req.file) {
+      // 🔸 Extract public_id from old Cloudinary URL
+      if (user.profilePhoto) {
+        const oldPublicId = user.profilePhoto.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`profile_photos/${oldPublicId}`);
+      }
+
+      // 🔹 Store new Cloudinary image URL
+      updates.profilePhoto = req.file.path;
+    }
+
+    // 🔹 Hash password if updated
     if (updates.password) {
       const salt = await bcrypt.genSalt(10);
       updates.password = await bcrypt.hash(updates.password, salt);
-    } else {
-      delete updates.password; // Ensure password isn't overridden with an empty value
     }
 
-    // Update user
+    // 🔹 Update user in DB
     const updatedUser = await User.findByIdAndUpdate(userId, updates, {
       new: true,
-      runValidators: true, // Ensure validation
-    }).select("-password"); // Exclude password from response
+      runValidators: true,
+    }).select("-password");
 
     res.status(200).json({
       success: true,
@@ -42,7 +53,6 @@ export const updateUserController = async (req, res) => {
     res.status(500).json({ message: `Server Error: ${error.message}` });
   }
 };
-
 
 // Get User Info 
 export const getUserController = async (req, res) => {
