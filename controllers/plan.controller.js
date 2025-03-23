@@ -58,6 +58,9 @@ export const getListingsByDuration = async (req, res) => {
 // Update Listing (Admins Only)
 export const updateListing = async (req, res) => {
     try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
         const listing = await Listing.findById(req.params.id);
         if (!listing) return res.status(404).json({ message: "Listing not found" });
 
@@ -76,6 +79,9 @@ export const updateListing = async (req, res) => {
 // Delete Listing (Admins Only)
 export const deleteListing = async (req, res) => {
     try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
         const listing = await Listing.findByIdAndDelete(req.params.id);
         if (!listing) return res.status(404).json({ message: "Listing not found" });
 
