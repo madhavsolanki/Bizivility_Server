@@ -4,7 +4,7 @@ import Listing from "../models/plan.model.js";
 export const createListing = async (req, res) => {
     try {
          
-        if (req.userRole !== "admin") {
+        if (req.user.role !== "admin") {
             return res.status(403).json({ message: "Access denied. Admins only." });
         }
 
