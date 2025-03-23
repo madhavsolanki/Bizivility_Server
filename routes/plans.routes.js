@@ -5,7 +5,7 @@ import isAdmin from "../middlewares/admin.middleware.js.js";
 
 const router = express.Router();
 
-router.post("/", authenticateUser, isAdmin, createListing);
+router.post("/", authenticateUser, createListing);
 router.get("/", getListings);
 router.get("/:duration", getListingsByDuration);
 router.put("/:id", authenticateUser, isAdmin, updateListing);

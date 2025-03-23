@@ -3,6 +3,11 @@ import Listing from "../models/plan.model.js";
 // Create Listing (Admins Only)
 export const createListing = async (req, res) => {
     try {
+         
+        if (req.userRole !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { planType, planDuration, price, features } = req.body;
         if (!planType || !planDuration || !price || !Array.isArray(features) || features.length === 0) {
             return res.status(400).json({ message: "All fields are required." });
