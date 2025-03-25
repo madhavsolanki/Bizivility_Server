@@ -45,3 +45,28 @@ export const uploadListingMiddleware = uploadListing.fields([
 ]);
 
 export { uploadProfile, uploadListing }; // ✅ Fix: Ensure export is correct
+
+// Configure Multer for memory storage
+const storage = multer.memoryStorage();
+
+// File Filter (Allow only image files)
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true); // Accept the file
+  } else {
+    cb(new Error("Only image files are allowed!"), false);
+  }
+};
+
+// Initialize Multer with limits and file filter
+export const uploadEventImage = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max file size
+  fileFilter: fileFilter,
+});
+
+export const uploadCouponImage = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max file size
+  fileFilter: fileFilter,
+});

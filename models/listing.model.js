@@ -129,10 +129,17 @@ const formSchema = new mongoose.Schema(
     announcements: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Announcement",
+    }],
+
+    events:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    }],
+
+    coupons:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coupon",
     }]
-
-
-
   },
   { timestamps: true }
 );

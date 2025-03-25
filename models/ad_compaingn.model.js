@@ -2,36 +2,31 @@ import mongoose from "mongoose";
 
 const addCompaignSchema = new mongoose.Schema(
   {
-    listing: 
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Listing",
-      },
-    
+    listing: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Form",
+    },
 
-    users: 
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
 
-    days:{
+    days: {
       type: Number,
       required: true,
     },
 
-    selectType:{
-      enum:["spotlight", "top_of_search", "sidebar"],
-      type:String,
+    adPlacement: {
+      // enum: ["SPOTLIGHT", "TOPOFSEARCH", "SIDEBAR"],
+      type: String,
       required: true,
     },
 
-    paymentMethod:{
-      enum:["paypal", "stripe", "upi" ,"credit_card"],
+    paymentMethod: {
       type: String,
       required: true,
-    }
+    },
   },
   { timestamps: true }
 );

@@ -4,10 +4,10 @@ const eventSchema = new mongoose.Schema({
 
   listing:{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Listing'
+      ref: 'Form'
     },
 
-  users:{
+  user:{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
@@ -22,10 +22,12 @@ const eventSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+
     latitude:{
       type: Number,
       required: true
     },
+
     longitude:{
       type: Number,
       required: true
@@ -34,9 +36,10 @@ const eventSchema = new mongoose.Schema({
 
   eventStart: {
     startDate: {
-      type: Date,
+      type: String,
       required: true
     },
+
     startTime: {
       type: String,
       required: true
@@ -44,12 +47,8 @@ const eventSchema = new mongoose.Schema({
   },
 
   eventEnd: {
-    enabled: {
-      type: Boolean,
-      default: false
-    },
     endDate: {
-      type: Date
+      type: String
     },
     endTime: {
       type: String
@@ -61,21 +60,20 @@ const eventSchema = new mongoose.Schema({
     required: true
   },
 
-  eventTickets: {
+  eventTickets:[ {
     platform: {
       type: String,
-      enum: ["Facebook", "Twitter"],
       required: true
     },
     url: {
       type: String,
       required: true
     }
-  },
+  }],
 
-  bannerImage: {
-    type: String,
-    required: true
+  eventImage: {
+    imageUrl:{type:String},
+    publicId:{type:String}
   }
 
 

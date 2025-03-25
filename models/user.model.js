@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     profilePhoto: {
-      type: String,
-      default: "",
+     imageUrl:{type:String},
+     publicId:{type:String} 
     },
     firstName: {
       type: String,
@@ -82,33 +82,6 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    // dashboard: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Dashboard",
-    // },
-
-    
-
-    // events: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Event",
-    //   },
-    // ],
-
-    // coupons: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Coupon",
-    //   },
-    // ],
-
-    // adCompaign: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Compaign",
-    //   },
-    // ],
 
     reviews: [
       {

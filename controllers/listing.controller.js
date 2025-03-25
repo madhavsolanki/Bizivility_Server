@@ -119,6 +119,139 @@ export const createForm = async (req, res) => {
   }
 };
 
+// export const updateForm = async (req, res) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: "User not authenticated" });
+//     }
+
+//     const { id } = req.params; // Form ID
+//     const form = await Form.findById(id);
+
+//     if (!form) {
+//       return res.status(404).json({ message: "Listing not found" });
+//     }
+
+//     if (form.buyerId.toString() !== req.user._id.toString()) {
+//       return res
+//         .status(403)
+//         .json({ message: "Unauthorized to update this listing" });
+//     }
+
+//     const {
+//       isPaid,
+//       listingStatus,
+//       listingTitle,
+//       businessTagline,
+//       customAddress,
+//       latitude,
+//       longitude,
+//       city,
+//       phoneNumber,
+//       websiteUrl,
+//       category,
+//       delivery,
+//       takeOut,
+//       amenities,
+//       gender,
+//       acceptPayments,
+//       priceRange,
+//       priceFrom,
+//       priceTo,
+//       businessHours,
+//       socialMediaLinks,
+//       frequentlyAskedQuestions,
+//       moreInformation,
+//       tagsOrKeywords,
+//     } = req.body;
+
+//     let updatedImages = form.images || [];
+//     let updatedBusinessLogo = form.businessLogo;
+
+//     // **Handle Image Updates**
+//     if (req.files && req.files["images"]) {
+//       // ✅ Delete old images from Cloudinary before uploading new ones
+//       for (const { publicId } of form.images) {
+//         await cloudinary.uploader.destroy(publicId);
+//       }
+
+//       // ✅ Upload new images to Cloudinary
+//       updatedImages = req.files["images"].map((file) => {
+//         return {
+//           imageUrl: file.path,
+//           publicId: getPublicId(file.path),
+//         };
+//       });
+//     }
+
+//     // **Handle Business Logo Update**
+//     if (req.files && req.files["businessLogo"]) {
+//       // ✅ Delete old business logo from Cloudinary before uploading new one
+//       if (form.businessLogo) {
+//         await cloudinary.uploader.destroy(form.businessLogo.publicId);
+//       }
+
+//       // ✅ Upload new business logo to Cloudinary
+//       updatedBusinessLogo = {
+//         imageUrl: req.files["businessLogo"][0].path,
+//         publicId: getPublicId(req.files["businessLogo"][0].path),
+//       };
+//     }
+
+//     // ✅ Apply lowercase & trim transformations at the controller level
+//     const formattedCity = city ? city.toLowerCase().trim().replace(/\s+/g, "") : form.city;
+//     const formattedCategory = category ? category.toLowerCase().trim().replace(/\s+/g, "") : form.category;
+
+//     // **Update only provided fields & preserve old values**
+//     form.listingTitle = listingTitle || form.listingTitle;
+//     form.businessTagline = businessTagline || form.businessTagline;
+//     form.customAddress = customAddress || form.customAddress;
+//     form.latitude = latitude || form.latitude;
+//     form.longitude = longitude || form.longitude;
+//     form.city = formattedCity || form.city;
+//     form.phoneNumber = phoneNumber || form.phoneNumber;
+//     form.websiteUrl = websiteUrl || form.websiteUrl;
+//     form.category = formattedCategory || form.category;
+//     form.delivery = delivery !== undefined ? delivery : form.delivery;
+//     form.takeOut = takeOut !== undefined ? takeOut : form.takeOut;
+//     form.amenities = amenities ? JSON.parse(amenities) : form.amenities;
+//     form.gender = gender || form.gender;
+//     form.acceptPayments = acceptPayments
+//       ? JSON.parse(acceptPayments)
+//       : form.acceptPayments;
+//     form.priceRange = priceRange || form.priceRange;
+//     form.priceFrom = priceFrom || form.priceFrom;
+//     form.priceTo = priceTo || form.priceTo;
+//     form.businessHours = businessHours
+//       ? JSON.parse(businessHours)
+//       : form.businessHours;
+//     form.socialMediaLinks = socialMediaLinks
+//       ? JSON.parse(socialMediaLinks)
+//       : form.socialMediaLinks;
+//     form.frequentlyAskedQuestions = frequentlyAskedQuestions
+//       ? JSON.parse(frequentlyAskedQuestions)
+//       : form.frequentlyAskedQuestions;
+//     form.moreInformation = moreInformation || form.moreInformation;
+//     form.tagsOrKeywords = tagsOrKeywords
+//       ? JSON.parse(tagsOrKeywords)
+//       : form.tagsOrKeywords;
+//     form.images = updatedImages;
+//     form.businessLogo = updatedBusinessLogo;
+//     (form.isPaid = isPaid || form.isPaid),
+//       (form.listingStatus = listingStatus || form.listingStatus);
+//     await form.save();
+
+//     res
+//       .status(200)
+//       .json({ message: "Listing updated successfully", data: form });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error", error: error.message });
+//   }
+// };
+
+
+// Updated code for form
 export const updateForm = async (req, res) => {
   try {
     if (!req.user) {
@@ -133,9 +266,7 @@ export const updateForm = async (req, res) => {
     }
 
     if (form.buyerId.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to update this listing" });
+      return res.status(403).json({ message: "Unauthorized to update this listing" });
     }
 
     const {
@@ -176,29 +307,38 @@ export const updateForm = async (req, res) => {
       }
 
       // ✅ Upload new images to Cloudinary
-      updatedImages = req.files["images"].map((file) => {
-        return {
-          imageUrl: file.path,
-          publicId: getPublicId(file.path),
-        };
-      });
+      updatedImages = await Promise.all(
+        req.files["images"].map(async (file) => {
+          const uploadResponse = await cloudinary.uploader.upload(file.path, {
+            folder: "business_images", // Change folder as needed
+          });
+          return {
+            imageUrl: uploadResponse.secure_url,
+            publicId: uploadResponse.public_id,
+          };
+        })
+      );
     }
 
     // **Handle Business Logo Update**
     if (req.files && req.files["businessLogo"]) {
       // ✅ Delete old business logo from Cloudinary before uploading new one
-      if (form.businessLogo) {
+      if (form.businessLogo && form.businessLogo.publicId) {
         await cloudinary.uploader.destroy(form.businessLogo.publicId);
       }
 
       // ✅ Upload new business logo to Cloudinary
+      const logoUploadResponse = await cloudinary.uploader.upload(req.files["businessLogo"][0].path, {
+        folder: "business_logos", // Change folder as needed
+      });
+
       updatedBusinessLogo = {
-        imageUrl: req.files["businessLogo"][0].path,
-        publicId: getPublicId(req.files["businessLogo"][0].path),
+        imageUrl: logoUploadResponse.secure_url,
+        publicId: logoUploadResponse.public_id,
       };
     }
 
-    // ✅ Apply lowercase & trim transformations at the controller level
+    // ✅ Apply lowercase & trim transformations
     const formattedCity = city ? city.toLowerCase().trim().replace(/\s+/g, "") : form.city;
     const formattedCategory = category ? category.toLowerCase().trim().replace(/\s+/g, "") : form.category;
 
@@ -216,40 +356,30 @@ export const updateForm = async (req, res) => {
     form.takeOut = takeOut !== undefined ? takeOut : form.takeOut;
     form.amenities = amenities ? JSON.parse(amenities) : form.amenities;
     form.gender = gender || form.gender;
-    form.acceptPayments = acceptPayments
-      ? JSON.parse(acceptPayments)
-      : form.acceptPayments;
+    form.acceptPayments = acceptPayments ? JSON.parse(acceptPayments) : form.acceptPayments;
     form.priceRange = priceRange || form.priceRange;
     form.priceFrom = priceFrom || form.priceFrom;
     form.priceTo = priceTo || form.priceTo;
-    form.businessHours = businessHours
-      ? JSON.parse(businessHours)
-      : form.businessHours;
-    form.socialMediaLinks = socialMediaLinks
-      ? JSON.parse(socialMediaLinks)
-      : form.socialMediaLinks;
-    form.frequentlyAskedQuestions = frequentlyAskedQuestions
-      ? JSON.parse(frequentlyAskedQuestions)
-      : form.frequentlyAskedQuestions;
+    form.businessHours = businessHours ? JSON.parse(businessHours) : form.businessHours;
+    form.socialMediaLinks = socialMediaLinks ? JSON.parse(socialMediaLinks) : form.socialMediaLinks;
+    form.frequentlyAskedQuestions = frequentlyAskedQuestions ? JSON.parse(frequentlyAskedQuestions) : form.frequentlyAskedQuestions;
     form.moreInformation = moreInformation || form.moreInformation;
-    form.tagsOrKeywords = tagsOrKeywords
-      ? JSON.parse(tagsOrKeywords)
-      : form.tagsOrKeywords;
+    form.tagsOrKeywords = tagsOrKeywords ? JSON.parse(tagsOrKeywords) : form.tagsOrKeywords;
     form.images = updatedImages;
     form.businessLogo = updatedBusinessLogo;
-    (form.isPaid = isPaid || form.isPaid),
-      (form.listingStatus = listingStatus || form.listingStatus);
+    form.isPaid = isPaid || form.isPaid;
+    form.listingStatus = listingStatus || form.listingStatus;
+
     await form.save();
 
-    res
-      .status(200)
-      .json({ message: "Listing updated successfully", data: form });
+    res.status(200).json({ message: "Listing updated successfully", data: form });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
+// Form Admin
 export const getAllListings = async (req, res) => {
   try {
     const listings = await Form.find();
@@ -259,6 +389,7 @@ export const getAllListings = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 export const getListingByUserId = async (req, res) => {
   try {

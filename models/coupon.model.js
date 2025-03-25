@@ -5,7 +5,7 @@ const couponSchema = new mongoose.Schema(
     listing: 
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Listing",
+        ref: "Form",
       },
     
 
@@ -17,19 +17,18 @@ const couponSchema = new mongoose.Schema(
     title:{
       type: String,
       required: true,
-      trim: true,
     },
+
     couponCode:{
       type: String,
       required: true,
       unique: true,
-      trim: true,
     },
-    DiscountValue:{
-      type: Number,
-      enum:["dollar", "percent"],
+
+    discountValue:{
+      type: String,
       required: true,
-      min: 0,
+      default:""
     },
 
     couponStart: {
@@ -44,10 +43,6 @@ const couponSchema = new mongoose.Schema(
     },
   
     couponsEnd: {
-      enabled: {
-        type: Boolean,
-        default: false
-      },
       endDate: {
         type: Date
       },
@@ -56,27 +51,14 @@ const couponSchema = new mongoose.Schema(
       }
     },
 
-    buttonName:{
-      type: String,
-      required: true,
-    },
-
-    buttonUrl:{
-      enabled: {
-        type: Boolean,
-        default: false
-      },
-      type:String
-    },
-
     details:{
       type: String,
       required: true,
     },
 
     couponImage:{
-      type: String,
-      required: true,
+      imageUrl:{type: String},
+      publicId:{type: String}
     }
 
 

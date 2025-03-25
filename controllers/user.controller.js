@@ -21,15 +21,18 @@ export const updateUserController = async (req, res) => {
 
     // 🔹 Handle profile photo update
     if (req.file) {
-      // 🔸 Extract public_id from old Cloudinary URL
-      if (user.profilePhoto) {
-        const oldPublicId = user.profilePhoto.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`profile_photos/${oldPublicId}`);
+      // 🔸 Extract old public_id and delete from Cloudinary
+      if (user.profilePhoto && user.profilePhoto.publicId) {
+        await cloudinary.uploader.destroy(user.profilePhoto.publicId);
       }
 
-      // 🔹 Store new Cloudinary image URL
-      updates.profilePhoto = req.file.path;
+      // 🔹 Store new Cloudinary image details
+      updates.profilePhoto = {
+        imageUrl: req.file.path, // Cloudinary image URL
+        publicId: req.file.filename, // Public ID
+      };
     }
+
 
     // 🔹 Hash password if updated
     if (updates.password) {
@@ -78,6 +81,26 @@ export const getUserController = async (req, res) => {
     res.status(500).json({ message: `Server Error: ${error.message}` });
   }
 }
+
+// GET user profile Image
+export const getUserProfileImage = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user || !user.profilePhoto || !user.profilePhoto.imageUrl || !user.profilePhoto.publicId) {
+      return res.status(404).json({ message: "User not found or profile photo not available" });
+    }
+
+    res.status(200).json({
+      profileImageUrl: user.profilePhoto.imageUrl, // Corrected property
+      publicId: user.profilePhoto.publicId
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
 
 
 
